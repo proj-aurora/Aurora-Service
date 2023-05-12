@@ -8,10 +8,10 @@ import { SignModule } from "./sign/sign.module";
 @Module({
   imports: [
     MongooseModule.forRootAsync({
+      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URI'),
       }),
-      imports: [ConfigModule],
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), // User model registration

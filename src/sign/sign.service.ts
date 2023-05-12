@@ -5,11 +5,13 @@ import { User, UserDocument } from '../mongo/user.entity';
 import { pollute, polluteVeil } from '../utils/crypto.utils';
 import { Sign_upDto } from "../dto/sign_up.dto";
 import { Sign_inDto } from "../dto/sign_in.dto";
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class SignService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private jwtService: JwtService,
   ) {}
 
   async sign_up(user: Sign_upDto) {
@@ -47,8 +49,10 @@ export class SignService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // You can add token generation or any other post-authentication logic here
+    const payload = { email: foundUser.email, sub: foundUser._id };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
 
-    return foundUser;
   }
 }
