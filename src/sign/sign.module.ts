@@ -1,11 +1,10 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { User, UserSchema } from "../mongo/user.entity";
+import { User, UserSchema } from "../schema/user.entity";
 import { SignController } from "./sign.controller";
 import { SignService } from "./sign.service";
 import {JwtModule} from "@nestjs/jwt";
 import {ConfigModule, ConfigService} from "@nestjs/config";
-
 
 @Module({
   imports: [
@@ -22,5 +21,4 @@ import {ConfigModule, ConfigService} from "@nestjs/config";
   controllers: [SignController],
   providers: [SignService],
 })
-
 export class SignModule {}
