@@ -27,11 +27,9 @@ export class SignUpDto {
   country: string;
 
   @IsString()
-  @IsNotEmpty()
-  group: string;
+  team: string;
 
   @IsString()
-  @IsNotEmpty()
   plan: string;
 
 }
