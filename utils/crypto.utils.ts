@@ -12,3 +12,7 @@ export function polluteVeil(password: string, salt: string): string {
   hash.update(password);
   return hash.digest('hex');
 }
+
+export function randomValue() {
+  return crypto.randomUUID().toString()
+}

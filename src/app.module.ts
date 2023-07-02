@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './mongo/user.entity'; // User model import
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CacheModule } from "@nestjs/common";
+import { User, UserSchema } from './schema/user.entity'; // User model import
+import { Team, TeamSchema } from "./schema/team.entity"; // Team model import
 import { SignModule } from "./sign/sign.module";
+import { TeamModule } from "./team/team.module";
+import { UserModule } from "./user/user.module";
+import {AuthModule} from "./auth/auth.module";
 
 @Module({
   imports: [
@@ -15,9 +19,13 @@ import { SignModule } from "./sign/sign.module";
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), // User model registration
+    MongooseModule.forFeature([{ name: Team.name, schema: TeamSchema }]), // Team model registration
     ConfigModule.forRoot(),
     CacheModule.register(),
     SignModule,
+    TeamModule,
+    UserModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

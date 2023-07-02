@@ -1,5 +1,5 @@
 import {Prop, raw, Schema, SchemaFactory} from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, {HydratedDocument, Types} from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -13,7 +13,7 @@ export class User {
   password: string;
 
   @Prop({ required: true })
-  salt: string; 
+  salt: string;
 
   @Prop({ required: true, unique: true })
   phone: string;
@@ -30,8 +30,8 @@ export class User {
   @Prop({ required: true })
   country: string;
 
-  @Prop({ required: true })
-  group: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Team' })
+  team: Types.ObjectId;
 
   @Prop({ required: true })
   plan: string;
