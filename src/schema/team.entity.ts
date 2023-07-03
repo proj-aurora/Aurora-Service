@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, HydratedDocument, Types } from "mongoose";
 
-export type TeamDocument = Team & Document;
+export type TeamDocument = HydratedDocument<Team>;
 
 @Schema()
 export class Team {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   registrationCode: string;
 
   @Prop([{ type: Types.ObjectId, ref: 'Member' }])

@@ -14,5 +14,5 @@ export function polluteVeil(password: string, salt: string): string {
 }
 
 export function randomValue() {
-  return crypto.randomUUID().toString()
+  return crypto.randomUUID().toString().replace(/-/g, '')
 }

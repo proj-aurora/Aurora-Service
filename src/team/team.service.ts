@@ -5,7 +5,7 @@ import { Model, Types } from "mongoose";
 import { Team } from "../schema/team.entity";
 import { Member } from "../schema/members.entity";
 import { Group } from "../schema/group.entity";
-import { pollute } from "../../utils/crypto.utils";
+import { pollute, randomValue } from "../../utils/crypto.utils";
 import { UserService } from "../user/user.service";
 import { Agent } from "../schema/agent.entity";
 import * as moment from "moment";
@@ -25,8 +25,9 @@ export class TeamService {
   }
 
   async idValue() {
-    const objectIdString = '64a0e230e6fb286fda02b941'; // get id from token
+    const objectIdString = '64a127b1702f3d306fd4a524'; // get id from token
     const _id: Types.ObjectId = new Types.ObjectId(objectIdString);
+    console.log('_id',_id);
     return _id;
   }
 
@@ -39,7 +40,7 @@ export class TeamService {
   async createTeam(name: string) {
     const id = await this.idValue()
     const user = await this.userService.getUserById(id)
-    const randomCode = pollute(); // random code
+    const randomCode = randomValue(); // random code
     const nowDate = await this.nowDate();
     const fullName = await this.fullName();
 
@@ -88,7 +89,13 @@ export class TeamService {
     // Find the team by ID
     const team = await this.teamModel.findById(_id);
     if (!team) {
-      throw new NotFoundException('Team not found');
+      return {
+        success: true,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Team not found',
+        }
+      }
     }
 
     // Delete the team's members
@@ -121,7 +128,30 @@ export class TeamService {
     if (!team) {
       throw new NotFoundException('Team not found');
     }
+    console.log('team', team)
+    const nowDate = await this.nowDate();
+    const fullName = await this.fullName();
 
+    const user = await this.userService.getUserById(_id)
 
+    const member = new this.memberModel({
+      id: team._id,
+      name: await this.fullName(),
+      email: user.data.email,
+      phone: user.data.phone,
+      permission: 'member',
+      lastUpdatedAt: nowDate,
+      lastUpdatedBy: fullName,
+    });
+
+    team.members.push(member._id);
+
+    return {
+      success: true,
+      data: {
+        statusCode: HttpStatus.OK,
+        message: 'Team joined successfully',
+      }
+    }
   }
 }
