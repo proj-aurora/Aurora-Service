@@ -56,7 +56,7 @@ export class SignService {
     } catch (error) {
       if (error instanceof HttpException) {
         return {
-          success: true,
+          success: false,
           data: {
             statusCode: HttpStatus.CONFLICT,
             message: 'Email or phone number already exists'
@@ -83,13 +83,18 @@ export class SignService {
   }
 
   // todo modify variable names with concepts from the Aurora
-  async sign_in(user: SignInDto): AsyncResponseBody<{
-    access_token: string;
-  }> {
+  async sign_in(user: SignInDto){
     // todo user authentication
     const foundUser = await this.userModel.findOne({ email: user.email });
     if (!foundUser || this.checkPassword(user, foundUser)) {
-      throw new UnauthorizedException('Invalid credentials');
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Invalid credentials',
+        }
+      }
+      // throw new UnauthorizedException('Invalid credentials');
     }
 
     // todo create access token
