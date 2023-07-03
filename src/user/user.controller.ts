@@ -1,26 +1,27 @@
 import {Body, Controller, Post, Put} from "@nestjs/common";
-import {UserService} from "./user.service";
+import { MessagePattern } from "@nestjs/microservices";
 import {Types} from "mongoose";
-import {UserUpdateDto} from "../dto/user_update.dto";
+import {UserService} from "./user.service";
+import {Request} from "@nestjs/common";
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('_id')
-  async getUserById(@Body() _id: Types.ObjectId) {
+  @MessagePattern({ check: 'id' })
+  async getUserById(@Body() _id: Types.ObjectId ) {
     return this.userService.getUserById(_id);
   }
 
-  @Post('email')
-  async getUserByEmail(@Body() body: { email: string }) {
-    const { email } = body;
+  @MessagePattern({ check: 'email' })
+  async getUserByEmail(@Body() email: string ) {
     return this.userService.getUserByEmail(email);
   }
 
-  @Put('update')
-  async update(@Body() body: { _id: Types.ObjectId, updateUserDto: UserUpdateDto }) {
-    const { _id, updateUserDto } = body;
-    return this.userService.update(_id, updateUserDto);
+  @MessagePattern({ check: 'update' })
+  async update(@Body() data: { userId: Types.ObjectId, country: string, plan: string }) {
+
+    const { userId, country, plan } = data;
+    return this.userService.update(userId, { country, plan });
   }
 }

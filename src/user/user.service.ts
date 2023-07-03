@@ -12,6 +12,7 @@ export class UserService {
   ) {}
 
   async getUserById(_id: Types.ObjectId): AsyncResponseBody<User> {
+    console.log(_id)
     const userInfo = await this.userModel.findById(_id)
     return {
       success: true,
