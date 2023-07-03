@@ -90,7 +90,7 @@ export class TeamService {
     const team = await this.teamModel.findById(_id);
     if (!team) {
       return {
-        success: true,
+        success: false,
         data: {
           statusCode: HttpStatus.NOT_FOUND,
           message: 'Team not found',
