@@ -5,7 +5,7 @@ import { SignController } from "./sign.controller";
 import { SignService } from "./sign.service";
 import {JwtModule} from "@nestjs/jwt";
 import {ConfigModule, ConfigService} from "@nestjs/config";
-import {jwtConstants} from "../../utils/secret.contents";
+import {jwtConstants} from "../../utils/secret.constants";
 
 @Module({
   imports: [
