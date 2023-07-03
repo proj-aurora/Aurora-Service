@@ -4,7 +4,7 @@ import { Document, Types } from 'mongoose';
 @Schema()
 export class Member {
   @Prop({ required: true })
-  id: string;
+  teamId: string;
 
   @Prop({ required: true })
   name: string;

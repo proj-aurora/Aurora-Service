@@ -4,7 +4,7 @@ import { Document, Types } from 'mongoose';
 @Schema()
 export class Group {
   @Prop({ required: true })
-  id: string;
+  teamId: string;
 
   @Prop({ required: true, default: 'Default Group' }) // 'agent'로 초기값 설정
   name: string;

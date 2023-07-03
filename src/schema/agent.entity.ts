@@ -4,10 +4,16 @@ import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 export class Agent {
 
   @Prop({ required: true })
-  id: string;
+  groupId: string;
 
   @Prop({ required: true, default: 'Default Agent' })
   name: string;
+
+  @Prop({ required: true, unique: true })
+  key: string;
+
+  @Prop({ required: true, unique: true })
+  account: string;
 
   @Prop({ required: true })
   lastUpdatedAt: Date;
