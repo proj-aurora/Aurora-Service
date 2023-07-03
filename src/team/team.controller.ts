@@ -10,9 +10,9 @@ export class TeamController {
 
   // @Post('create')
   @MessagePattern({ check: 'create' })
-  async createTeam(@Body() data: { name: string }) {
-    const { name } = data;
-    return await this.teamService.createTeam(name);
+  async createTeam(@Body() data: { name: string, userId: Types.ObjectId }) {
+    const { name, userId } = data;
+    return await this.teamService.createTeam(name, userId);
   }
 
   // @Delete('delete')
