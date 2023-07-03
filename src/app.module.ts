@@ -7,7 +7,7 @@ import { Team, TeamSchema } from "./schema/team.entity"; // Team model import
 import { SignModule } from "./sign/sign.module";
 import { TeamModule } from "./team/team.module";
 import { UserModule } from "./user/user.module";
-import {AuthModule} from "./auth/auth.module";
+import { AuthModule } from "./auth/auth.module";
 
 @Module({
   imports: [
