@@ -29,6 +29,15 @@ export class TeamService {
     return user.data.name. firstName + ' ' + user.data.name.lastName;
   }
 
+  async teamInfo(teamId: Types.ObjectId, userId: Types.ObjectId) {
+    const team = await this.teamModel.findById(teamId);
+    const user = await this.userService.getUserById(userId);
+    if (!team) {
+      throw new NotFoundException('Team not found');
+    }
+    return team;
+  }
+
   async createTeam(name: string, _id: Types.ObjectId) {
     const user = await this.userService.getUserById(_id)
     const randomCode = randomValue(); // random code

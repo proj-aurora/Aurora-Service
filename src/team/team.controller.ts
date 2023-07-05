@@ -8,6 +8,12 @@ import { MessagePattern } from "@nestjs/microservices";
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
+  @MessagePattern({ check: 'info' })
+  async teamInfo(@Body() data: { teamId: Types.ObjectId, userId: Types.ObjectId }) {
+    const { teamId, userId } = data;
+    return await this.teamService.teamInfo(teamId, userId);
+  }
+
   // @Post('create')
   @MessagePattern({ check: 'create' })
   async createTeam(@Body() data: { name: string, userId: Types.ObjectId }) {
