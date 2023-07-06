@@ -30,11 +30,8 @@ export class User {
   @Prop({ required: true })
   country: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Team' })
-  team: Types.ObjectId;
-
-  @Prop({ required: true })
-  plan: string;
+  @Prop([{ type: Types.ObjectId, ref: 'Team' }])
+  team: Types.ObjectId[];
 
 }
 

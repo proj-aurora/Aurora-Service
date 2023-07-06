@@ -21,6 +21,9 @@ export class Team {
   createdAt: string;
 
   @Prop({ required: true })
+  plan: string;
+
+  @Prop({ required: true })
   owner: string;
 }
 
