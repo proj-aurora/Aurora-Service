@@ -28,10 +28,6 @@ export class SignUpDto {
 
   @IsString()
   team: string;
-
-  @IsString()
-  plan: string;
-
 }
 
 
