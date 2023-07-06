@@ -13,9 +13,15 @@ export class UserController {
     return this.userService.getUserById(_id);
   }
 
+
   @MessagePattern({ check: 'email' })
   async getUserByEmail(@Body() email: string ) {
     return this.userService.getUserByEmail(email);
+  }
+
+  @MessagePattern({ check: 'team' })
+  async getTeamList(@Body() userId: Types.ObjectId ) {
+    return this.userService.getTeamList(userId);
   }
 
   @MessagePattern({ check: 'update' })
