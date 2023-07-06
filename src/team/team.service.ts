@@ -9,10 +9,12 @@ import { pollute, randomValue } from "../../utils/crypto.utils";
 import { UserService } from "../user/user.service";
 import { Agent } from "../schema/agent.entity";
 import * as moment from "moment";
+import { User } from "../schema/user.entity";
 
 @Injectable()
 export class TeamService {
   constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Team.name) private teamModel: Model<Team>,
     @InjectModel(Member.name) private memberModel: Model<Member>,
     @InjectModel(Group.name) private groupModel: Model<Group>,
@@ -38,15 +40,16 @@ export class TeamService {
     return team;
   }
 
-  async createTeam(name: string, _id: Types.ObjectId) {
+  async createTeam(name: string, plan: string, _id: Types.ObjectId) {
     const user = await this.userService.getUserById(_id)
     const randomCode = randomValue(); // random code
     const nowDate = await this.nowDate();
     const fullName = await this.fullName(_id);
 
-    const team = new this.teamModel({ name, registrationCode: randomCode });
+    const team = new this.teamModel({ name, plan, registrationCode: randomCode });
     team.createdAt = nowDate;
     team.owner = fullName;
+    team.plan = plan;
 
     // Create initial member data
     const member = new this.memberModel({
@@ -84,6 +87,10 @@ export class TeamService {
     await agent.save();
     await team.save();
 
+    const belongsToTeam  = await this.userModel.findOne({ _id: _id })
+    belongsToTeam.team.push(team._id)
+    await belongsToTeam.save();
+
     return team;
   }
 
@@ -99,6 +106,8 @@ export class TeamService {
         }
       }
     }
+
+    await this.userModel.updateMany({ team: { _id } }, { $pull: { team: { _id } } })
 
     // Delete the team's members
     await this.memberModel.deleteMany({ teamId: _id });
