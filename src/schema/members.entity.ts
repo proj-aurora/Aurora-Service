@@ -7,6 +7,9 @@ export class Member {
   teamId: string;
 
   @Prop({ required: true })
+  userId: string;
+
+  @Prop({ required: true })
   name: string;
 
   @Prop({ required: true })

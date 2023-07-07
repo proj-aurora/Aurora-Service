@@ -33,12 +33,40 @@ export class TeamService {
 
   async teamInfo(teamId: Types.ObjectId, userId: Types.ObjectId) {
     const team = await this.teamModel.findById(teamId);
-    const user = await this.userService.getUserById(userId);
+
+    const members = team.members.map(member => member.toString());
+
+    const member = await this.memberModel.find({ _id: { $in: members } });
+
+    const userIds = member.map(member => member.userId.toString()); // Extract userIds as strings
+
+    const users = await this.userModel.find({ _id: { $in: userIds } });
+
     if (!team) {
-      throw new NotFoundException('Team not found');
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Team not found',
+        },
+      };
     }
+
+    const authorizedUser = users.find(user => user._id.toString() === userId.toString());
+    console.log(authorizedUser)
+    if (!authorizedUser) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Unauthorized',
+        },
+      };
+    }
+
     return team;
   }
+
 
   async createTeam(name: string, plan: string, _id: Types.ObjectId) {
     const user = await this.userService.getUserById(_id)
@@ -54,6 +82,7 @@ export class TeamService {
     // Create initial member data
     const member = new this.memberModel({
       teamId: team._id,
+      userId: _id,
       name: fullName,
       email: user.data.email,
       phone: user.data.phone,
