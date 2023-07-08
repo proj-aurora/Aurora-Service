@@ -1,8 +1,17 @@
 import { IsString } from 'class-validator';
 export class UserUpdateDto {
   @IsString()
-  readonly plan: string;
+  readonly country: string;
 
   @IsString()
-  readonly country: string;
+  readonly firstName: string;
+
+  @IsString()
+  readonly lastName: string;
+
+  @IsString()
+  readonly newPW: string;
+
+  @IsString()
+  readonly currentPW: string;
 }

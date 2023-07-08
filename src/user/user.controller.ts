@@ -25,9 +25,9 @@ export class UserController {
   }
 
   @MessagePattern({ check: 'update' })
-  async update(@Body() data: { userId: Types.ObjectId, country: string, plan: string }) {
+  async update(@Body() data: { userId: Types.ObjectId, country: string, firstName: string, lastName: string, newPW: string, currentPW }) {
 
-    const { userId, country, plan } = data;
-    return this.userService.update(userId, { country, plan });
+    const { userId, country, firstName, lastName, newPW, currentPW } = data;
+    return this.userService.update(userId, { country, firstName, lastName, newPW, currentPW });
   }
 }

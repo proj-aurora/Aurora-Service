@@ -5,6 +5,7 @@ import { Team, TeamDocument } from "../schema/team.entity";
 import { Model, Types } from "mongoose";
 import { AsyncResponseBody } from "../model/ResponseBody";
 import { UserUpdateDto } from "../dto/user_update.dto";
+import { pollute, polluteVeil } from "../../utils/crypto.utils";
 
 @Injectable()
 export class UserService {
@@ -40,11 +41,50 @@ export class UserService {
     }
   }
 
-  async update(_id: Types.ObjectId, updateUserDto: UserUpdateDto): Promise<UserDocument> {
-    const updatedUser = await this.userModel.findByIdAndUpdate(_id, updateUserDto, { new: true });
-    if (!updatedUser) {
-      throw new Error('User not found');
+  async update(userId: Types.ObjectId, updateUserDto: UserUpdateDto) {
+    const { country, firstName, lastName, newPW, currentPW } = updateUserDto;
+    const user = await this.userModel.findById(userId);
+
+    // Check if the password matches the user's current password
+    const currentPollutedVeil = polluteVeil(currentPW, user.salt);
+    if (currentPollutedVeil !== user.password) {
+      return {
+        success: false,
+        data: {
+          message: 'Invalid current password'
+        }
+      }
     }
-    return updatedUser;
+
+    // Create a new salt and hashed password
+    const newSalt = pollute();
+    const newPassword = polluteVeil(newPW, newSalt);
+
+    // Update the user's information
+    const updatedUser = await this.userModel.findByIdAndUpdate(userId, {
+      country,
+      name: {
+        firstName,
+        lastName,
+      },
+      password: newPassword,
+      salt: newSalt
+    }, { new: true });
+
+    if (!updatedUser) {
+      return {
+        success: false,
+        data: {
+          message: 'User not found'
+        }
+      }
+    }
+
+    return {
+      success: true,
+      data: {
+        message: 'User updated successfully'
+      }
+    };
   }
 }
