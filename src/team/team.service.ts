@@ -8,7 +8,8 @@ import { Group } from "../schema/group.entity";
 import { pollute, randomValue } from "../../utils/crypto.utils";
 import { UserService } from "../user/user.service";
 import { Agent } from "../schema/agent.entity";
-import * as moment from "moment";
+// import * as moment from "moment";
+import * as moment from 'moment-timezone';
 import { User } from "../schema/user.entity";
 
 @Injectable()
@@ -23,7 +24,7 @@ export class TeamService {
   ) {}
 
   async nowDate() {
-    return moment().format('YYYY-MM-DD HH:mm:ss')
+    return moment().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
   }
 
   async fullName(_id: Types.ObjectId) {
