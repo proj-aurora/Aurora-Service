@@ -53,7 +53,6 @@ export class TeamService {
     }
 
     const authorizedUser = users.find(user => user._id.toString() === userId.toString());
-    console.log(authorizedUser)
     if (!authorizedUser) {
       return {
         success: false,
@@ -64,7 +63,12 @@ export class TeamService {
       };
     }
 
-    return team;
+    return {
+      success: true,
+      data: {
+        team
+      }
+    };
   }
 
 
