@@ -8,6 +8,7 @@ import { SignModule } from "./sign/sign.module";
 import { TeamModule } from "./team/team.module";
 import { UserModule } from "./user/user.module";
 import { AuthModule } from "./auth/auth.module";
+import { InfluxDBModule } from "./influx/influx.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AuthModule } from "./auth/auth.module";
     TeamModule,
     UserModule,
     AuthModule,
+    InfluxDBModule,
   ],
   controllers: [],
   providers: [],
