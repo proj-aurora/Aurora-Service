@@ -8,7 +8,7 @@ function location_aurora(port: string): string {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   const configService = app.get(ConfigService);
   const port = configService.get('AURORA_PORT');
 
