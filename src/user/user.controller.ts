@@ -24,6 +24,12 @@ export class UserController {
     return this.userService.getTeamList(userId);
   }
 
+  @MessagePattern({ check: 'newPW' })
+  async updatePW(@Body() data: { userId: Types.ObjectId, currentPW: string, newPW: string }) {
+    const { userId, currentPW, newPW } = data;
+    return this.userService.newPassword(userId, currentPW, newPW);
+  }
+
   @MessagePattern({ check: 'update' })
   async update(@Body() data: { userId: Types.ObjectId, country: string, firstName: string, lastName: string, currentPW }) {
 

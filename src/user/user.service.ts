@@ -41,6 +41,32 @@ export class UserService {
     }
   }
 
+  async newPassword(userId: Types.ObjectId, currentPW: string, newPW: string ) {
+    const user = await this.userModel.findById(userId);
+
+    const currentPollutedVeil = polluteVeil(currentPW, user.salt)
+    if ( currentPollutedVeil !== user.password ) {
+      return {
+        success: false,
+        data: {
+          message: 'Invalid current password'
+        }
+      }
+    }
+
+    const salt = pollute()
+    const newPassword = polluteVeil(newPW, salt)
+
+    await this.userModel.findByIdAndUpdate(userId, { password: newPassword, salt: salt })
+
+    return {
+      success: true,
+      data: {
+        message: 'Password updated successfully'
+      }
+    }
+  }
+
   async update(userId: Types.ObjectId, updateUserDto: UserUpdateDto) {
     const { country, firstName, lastName, currentPW } = updateUserDto;
     const user = await this.userModel.findById(userId);
