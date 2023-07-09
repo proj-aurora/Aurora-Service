@@ -10,8 +10,5 @@ export class UserUpdateDto {
   readonly lastName: string;
 
   @IsString()
-  readonly newPW: string;
-
-  @IsString()
   readonly currentPW: string;
 }

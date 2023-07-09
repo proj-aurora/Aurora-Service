@@ -42,7 +42,7 @@ export class UserService {
   }
 
   async update(userId: Types.ObjectId, updateUserDto: UserUpdateDto) {
-    const { country, firstName, lastName, newPW, currentPW } = updateUserDto;
+    const { country, firstName, lastName, currentPW } = updateUserDto;
     const user = await this.userModel.findById(userId);
 
     // Check if the password matches the user's current password
@@ -56,10 +56,6 @@ export class UserService {
       }
     }
 
-    // Create a new salt and hashed password
-    const newSalt = pollute();
-    const newPassword = polluteVeil(newPW, newSalt);
-
     // Update the user's information
     const updatedUser = await this.userModel.findByIdAndUpdate(userId, {
       country,
@@ -67,8 +63,6 @@ export class UserService {
         firstName,
         lastName,
       },
-      password: newPassword,
-      salt: newSalt
     }, { new: true });
 
     if (!updatedUser) {
