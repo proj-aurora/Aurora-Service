@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpCode, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { User, UserDocument } from "../schema/user.entity";
 import { Team, TeamDocument } from "../schema/team.entity";
@@ -48,6 +48,7 @@ export class UserService {
     if ( currentPollutedVeil !== user.password ) {
       return {
         success: false,
+        statusCode: HttpStatus.UNAUTHORIZED,
         data: {
           message: 'Invalid current password'
         }
