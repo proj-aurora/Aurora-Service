@@ -68,16 +68,17 @@ export class UserService {
   }
 
   async update(userId: Types.ObjectId, updateUserDto: UserUpdateDto) {
-    const { country, firstName, lastName, currentPW } = updateUserDto;
-    const user = await this.userModel.findById(userId);
+    const { country, firstName, lastName, phone } = updateUserDto;
 
-    // Check if the password matches the user's current password
-    const currentPollutedVeil = polluteVeil(currentPW, user.salt);
-    if (currentPollutedVeil !== user.password) {
-      return {
-        success: false,
-        data: {
-          message: 'Invalid current password'
+    const user  = await this.userModel.findById(userId);
+    const existNumber = await this.userModel.findOne({ phone: phone});
+    if (existNumber) {
+      if (existNumber.id !== user.id){
+        return {
+          success: false,
+          data: {
+            message: 'Phone number already exists'
+          }
         }
       }
     }
@@ -89,6 +90,7 @@ export class UserService {
         firstName,
         lastName,
       },
+      phone,
     }, { new: true });
 
     if (!updatedUser) {

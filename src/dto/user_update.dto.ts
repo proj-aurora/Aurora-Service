@@ -10,5 +10,5 @@ export class UserUpdateDto {
   readonly lastName: string;
 
   @IsString()
-  readonly currentPW: string;
+  readonly phone: string;
 }
