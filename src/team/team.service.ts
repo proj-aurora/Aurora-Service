@@ -1,15 +1,15 @@
 // team.service.ts
-import { HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { Team } from "../schema/team.entity";
 import { Member } from "../schema/members.entity";
 import { Group } from "../schema/group.entity";
-import { pollute, randomValue } from "../../utils/crypto.utils";
+import { randomValue } from "../../utils/crypto.utils";
 import { UserService } from "../user/user.service";
 import { Agent } from "../schema/agent.entity";
 // import * as moment from "moment";
-import * as moment from 'moment-timezone';
+import * as moment from "moment-timezone";
 import { User } from "../schema/user.entity";
 
 @Injectable()
@@ -32,6 +32,25 @@ export class TeamService {
     return user.data.name. firstName + ' ' + user.data.name.lastName;
   }
 
+  async memberList(teamId: Types.ObjectId, userId: Types.ObjectId) {
+    const team = await this.teamModel.findById(teamId);
+
+    const checkMember = await this.checkMember(teamId, userId);
+
+    if (checkMember === false) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: "You're not part of the team",
+        },
+      };
+    }
+
+    const members = team.members.map(member => member.toString());
+    return this.memberModel.find({ _id: { $in: members } });
+  }
+
   async teamInfo(teamId: Types.ObjectId, userId: Types.ObjectId) {
     const team = await this.teamModel.findById(teamId);
 
@@ -39,7 +58,7 @@ export class TeamService {
 
     const member = await this.memberModel.find({ _id: { $in: members } });
 
-    const userIds = member.map(member => member.userId.toString()); // Extract userIds as strings
+    const userIds = member.map(member => member.userId ); // Extract userIds as strings
 
     const users = await this.userModel.find({ _id: { $in: userIds } });
 
@@ -59,7 +78,7 @@ export class TeamService {
         success: false,
         data: {
           statusCode: HttpStatus.UNAUTHORIZED,
-          message: 'Unauthorized',
+          message: "You're not part of the team",
         },
       };
     }
@@ -165,36 +184,109 @@ export class TeamService {
     }
   }
 
-  async StandByStatus(_id: Types.ObjectId) {
+  async checkMember(teamId: Types.ObjectId, userId: Types.ObjectId) {
+    const member = this.memberModel.find({ teamId: teamId, userId: userId });
+    if (member) {
+      return true;
+    }
   }
 
-  async joinTeamByRegistrationCode(registrationCode: string, _id: Types.ObjectId) {
+  async joinTeamBySelf(registrationCode: string, _id: Types.ObjectId) {
     const team = await this.teamModel.findOne({ registrationCode });
+    console.log(team, _id)
     if (!team) {
-      throw new NotFoundException('Team not found');
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Team not found',
+        }
+      }
     }
+
     const nowDate = await this.nowDate();
     const fullName = await this.fullName(_id);
 
-    const user = await this.userService.getUserById(_id)
+    const checkMember = await this.memberModel.findOne({ teamId: team._id, userId: _id });
+    if (checkMember) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'You already joined this team',
+        }
+      }
+    }
+
+    const user  = await this.userModel.findOne({ _id: _id })
 
     const member = new this.memberModel({
       teamId: team._id,
+      userId: _id,
       name: fullName,
-      email: user.data.email,
-      phone: user.data.phone,
+      email: user.email,
+      phone: user.phone,
       permission: 'member',
       lastUpdatedAt: nowDate,
       lastUpdatedBy: fullName,
     });
 
+
     team.members.push(member._id);
+    user.team.push(team._id)
+
+    await member.save();
+    await team.save()
+    await user.save();
 
     return {
       success: true,
       data: {
         statusCode: HttpStatus.OK,
         message: 'Team joined successfully',
+      }
+    }
+  }
+
+
+  async leaveTeam(teamId: Types.ObjectId, userId: Types.ObjectId) {
+    const team = await this.teamModel.findById(teamId);
+    if (!team) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Team not found',
+        }
+      }
+    }
+
+    const member = await this.memberModel.findOne({ teamId, userId });
+
+    if (!member) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Member not found',
+        }
+      }
+    }
+
+    // Remove the teamId from the user's team array
+    await this.userModel.updateOne({ _id: userId }, { $pull: { team: teamId }});
+
+    // Remove the userId from the team's members array
+    await this.teamModel.updateOne({ _id: teamId }, { $pull: { members: userId }});
+
+    // Delete the member from the team
+    await member.deleteOne();
+
+    return {
+      success: true,
+      data: {
+        statusCode: HttpStatus.OK,
+        message: 'Team left successfully',
       }
     }
   }

@@ -30,14 +30,14 @@ export class TeamController {
   // @Post('join')
   @MessagePattern({ check: 'join' })
   async joinTeam(@Body() body: { registrationCode: string, userId: Types.ObjectId }) {
-    console.log(body)
     const { registrationCode, userId } = body;
-    return await this.teamService.joinTeamByRegistrationCode(registrationCode, userId);
+    return await this.teamService.joinTeamBySelf(registrationCode, userId);
   }
 
-  @Get('hello')
-  async hello() {
-    return 'hello'
+  @MessagePattern({ check: 'member' })
+  async leaveTeam(@Body() body: { teamId: Types.ObjectId, userId: Types.ObjectId }) {
+    const { teamId, userId } = body;
+    return await this.teamService.memberList(teamId, userId);
   }
 
 }
