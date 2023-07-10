@@ -73,4 +73,10 @@ export class EventGateway
     return await influxData
   }
 
+  @SubscribeMessage('overview')
+  async handleAll(@MessageBody() data: {start: string, stop: string, key: string, windowPeriod: string}, client: Socket): Promise<any> {
+    const influxData = await this.influxDBService.getAll(data.start, data.stop, data.key, data.windowPeriod);
+    return await influxData
+  }
+
 }

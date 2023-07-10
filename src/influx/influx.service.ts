@@ -21,6 +21,7 @@ export class InfluxDBService {
       `|> aggregateWindow(every: ${windowPeriod}, fn: mean, createEmpty: false) ` +
       `|> yield(name: "mean")`;
 
+
     const result = [];
 
     return new Promise((resolve, reject) => {
@@ -124,6 +125,35 @@ export class InfluxDBService {
         },
         complete() {
           resolve(result);
+        },
+      });
+    });
+  }
+
+  async getAll(start: string, stop: string, key: string, windowPeriod: string) {
+    const all = this.influxDBClient.getQueryApi('aurora');
+
+    const fluxQuery =
+      `from(bucket: "auroraTest") ` +
+      `|> range(start: ${start}, stop: ${stop}) ` +
+      `|> filter(fn: (r) => r["key"] == "${key}") ` +
+      `|> aggregateWindow(every: ${windowPeriod}, fn: mean, createEmpty: false) ` +
+      `|> yield(name: "mean")` +
+      `|> limit(n:1)`;
+
+    const result = [];
+
+    return new Promise((resolve, reject) => {
+      all.queryRows(fluxQuery, {
+        next(row, tableMeta) {
+          const o = tableMeta.toObject(row);
+          result.push(o);
+        },
+        error(error) {
+          reject(error);
+        },
+        complete() {
+          resolve(result.slice(0, 11));
         },
       });
     });
