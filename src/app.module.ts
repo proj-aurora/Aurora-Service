@@ -9,6 +9,7 @@ import { TeamModule } from "./team/team.module";
 import { UserModule } from "./user/user.module";
 import { AuthModule } from "./auth/auth.module";
 import { InfluxDBModule } from "./influx/influx.module";
+import { AgentDataModule } from "./agent/agent.module";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { InfluxDBModule } from "./influx/influx.module";
     UserModule,
     AuthModule,
     InfluxDBModule,
+    AgentDataModule,
   ],
   controllers: [],
   providers: [],
