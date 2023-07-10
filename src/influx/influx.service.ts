@@ -153,7 +153,7 @@ export class InfluxDBService {
           reject(error);
         },
         complete() {
-          resolve(result.slice(0, 11));
+          resolve(result);
         },
       });
     });
