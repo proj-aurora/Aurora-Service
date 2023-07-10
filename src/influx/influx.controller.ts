@@ -31,4 +31,10 @@ export class InfluxController {
     return this.influxDBService.getSwap(start, stop, key, windowPeriod);
   }
 
+  @MessagePattern({ check: 'overview' })
+  async getOverview(@Body() data: {start: string, stop: string, key: string, windowPeriod: string}){
+    const { start, stop, key, windowPeriod } = data;
+    return this.influxDBService.getAll(start, stop, key, windowPeriod);
+  }
+
 }
