@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from "@nestjs/config";
+import { WsAdapter } from '@nestjs/platform-ws';
 import { Transport } from "@nestjs/microservices";
 
 function location_aurora(port: string): string {
@@ -9,6 +10,7 @@ function location_aurora(port: string): string {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+  app.useWebSocketAdapter(new WsAdapter(app));
   const configService = app.get(ConfigService);
   const port = configService.get('AURORA_PORT');
 

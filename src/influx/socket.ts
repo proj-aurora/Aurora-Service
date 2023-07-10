@@ -6,7 +6,7 @@ import {
   OnGatewayDisconnect, SubscribeMessage, MessageBody
 } from "@nestjs/websockets";
 import { Logger } from '@nestjs/common';
-import { Socket, Server } from 'socket.io';
+import { Server, Socket } from 'ws';
 import { InfluxDBService } from './influx.service';
 
 @WebSocketGateway({
@@ -20,6 +20,9 @@ export class EventGateway
 
   @WebSocketServer() server: Server;
 
+  // Track all connected clients
+  private clients: Set<Socket> = new Set();
+
   constructor(private readonly influxDBService: InfluxDBService) {}
 
   afterInit(server: Server) {
@@ -28,25 +31,31 @@ export class EventGateway
 
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
+    // Add newly connected client to the set
+    this.clients.add(client);
   }
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
+    // Remove disconnected client from the set
+    this.clients.delete(client);
   }
 
   @SubscribeMessage('test')
-  async handleMessage(@MessageBody() data) {
+  async handleMessage(@MessageBody() data, client: Socket) {
     console.log(data);
+    // client.send(JSON.stringify({ event: 'server', data }));
     this.server.emit('server', data);
+    return data;
   }
 
   @SubscribeMessage('influx')
   async handleInflux(@MessageBody() data: {start: string, stop: string, windowPeriod: string}, client: Socket): Promise<any> {
-    client.emit('events', 'test');
-    setInterval(async () => {
-      const influxData = await this.influxDBService.getData(data.start, data.stop, data.windowPeriod);
-      client.emit('events', influxData);
-      this.server.emit('events', influxData);
-    }, 5000); // Set interval as needed
+    // client.send(JSON.stringify({ event: 'events', data: 'test' }));
+    console.log(data)
+    const influxData = await this.influxDBService.getData(data.start, data.stop, data.windowPeriod);
+    console.log(influxData)
+    // Emit to each connected client
+    return await influxData
   }
 }
