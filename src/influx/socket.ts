@@ -49,13 +49,28 @@ export class EventGateway
     return data;
   }
 
-  @SubscribeMessage('influx')
-  async handleInflux(@MessageBody() data: {start: string, stop: string, windowPeriod: string}, client: Socket): Promise<any> {
-    // client.send(JSON.stringify({ event: 'events', data: 'test' }));
-    console.log(data)
-    const influxData = await this.influxDBService.getData(data.start, data.stop, data.windowPeriod);
-    console.log(influxData)
-    // Emit to each connected client
+  @SubscribeMessage('cpu')
+  async handleCpu(@MessageBody() data: {start: string, stop: string, key: string, windowPeriod: string}, client: Socket): Promise<any> {
+    const influxData = await this.influxDBService.getCpu(data.start, data.stop, data.key, data.windowPeriod);
     return await influxData
   }
+
+  @SubscribeMessage('disk')
+  async handleDisk(@MessageBody() data: {start: string, stop: string, key: string, windowPeriod: string}, client: Socket): Promise<any> {
+    const influxData = await this.influxDBService.getDisk(data.start, data.stop, data.key, data.windowPeriod);
+    return await influxData
+  }
+
+  @SubscribeMessage('memory')
+  async handleMemory(@MessageBody() data: {start: string, stop: string, key: string, windowPeriod: string}, client: Socket): Promise<any> {
+    const influxData = await this.influxDBService.getMemory(data.start, data.stop, data.key, data.windowPeriod);
+    return await influxData
+  }
+
+  @SubscribeMessage('swap')
+  async handleSwap(@MessageBody() data: {start: string, stop: string, key: string, windowPeriod: string}, client: Socket): Promise<any> {
+    const influxData = await this.influxDBService.getSwap(data.start, data.stop, data.key, data.windowPeriod);
+    return await influxData
+  }
+
 }
