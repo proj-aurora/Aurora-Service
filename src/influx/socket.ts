@@ -9,7 +9,11 @@ import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { InfluxDBService } from './influx.service';
 
-@WebSocketGateway(8080, { transports: ['websocket'] })
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
 export class EventGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   private logger: Logger = new Logger('EventGateway');
