@@ -25,7 +25,7 @@ export class InfluxController {
     return this.influxDBService.getMemory(start, stop, key, windowPeriod);
   }
 
-  @MessagePattern({ check: 'network' })
+  @MessagePattern({ check: 'swap' })
   async getSwap(@Body() data: {start: string, stop: string, key: string, windowPeriod: string}){
     const { start, stop, key, windowPeriod } = data;
     return this.influxDBService.getSwap(start, stop, key, windowPeriod);
