@@ -45,7 +45,6 @@ export class SyslogGateway
 
   @SubscribeMessage('syslog')
   async recentData(@MessageBody() data: { key: string, limit: number }, client: Socket) {
-    console.log(data)
     const { key, limit } = data;
     return await this.agentService.recentData(key, limit);
   }

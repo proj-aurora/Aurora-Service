@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from 'mongoose';
+import { Model } from "mongoose";
 import { Agent_Data, AgentDataDocument } from "../schema/agent_data.entity";
 
 // agent.service.ts
@@ -11,10 +11,16 @@ export class AgentService {
   ) {}
 
   async recentData(key: string, limit: number) {
-    return this.agentDataModel
+    const log = await this.agentDataModel
       .find({ key: key })
       .sort({ datetime: -1 })
       .limit(limit)
       .exec();
+
+    return log.map((log) => {
+      return {
+        data: log.data,
+      }
+    });
   }
 }
