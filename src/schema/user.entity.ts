@@ -27,6 +27,9 @@ export class User {
     lastName: string;
   };
 
+  @Prop()
+  profileImage: string;
+
   @Prop({ required: true })
   country: string;
 

@@ -1,8 +1,7 @@
-import {Body, Controller, Post, Put} from "@nestjs/common";
+import { Body, Controller } from "@nestjs/common";
 import { MessagePattern } from "@nestjs/microservices";
-import {Types} from "mongoose";
-import {UserService} from "./user.service";
-import {Request} from "@nestjs/common";
+import { Types } from "mongoose";
+import { UserService } from "./user.service";
 
 @Controller('user')
 export class UserController {
@@ -35,5 +34,17 @@ export class UserController {
 
     const { userId, country, firstName, lastName, phone } = data;
     return this.userService.update(userId, { country, firstName, lastName, phone });
+  }
+
+  @MessagePattern({ check: 'upload' })
+  async uploadFile(@Body() data: { userId: Types.ObjectId, fileName: string }) {
+    const { userId, fileName } = data;
+    return await this.userService.uploadProfileImage(userId, fileName);
+  }
+
+  @MessagePattern({ check: 'image' })
+  async getImage(@Body() data: { userId: Types.ObjectId }) {
+    const { userId } = data;
+    return await this.userService.findProfileImage(userId);
   }
 }

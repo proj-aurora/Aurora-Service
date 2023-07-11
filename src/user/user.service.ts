@@ -1,4 +1,4 @@
-import { HttpCode, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { User, UserDocument } from "../schema/user.entity";
 import { Team, TeamDocument } from "../schema/team.entity";
@@ -109,5 +109,41 @@ export class UserService {
         message: 'User updated successfully'
       }
     };
+  }
+
+  async uploadProfileImage(userId: Types.ObjectId, fileName: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      return {
+        success: false,
+        data: {
+          message: 'User not found'
+        }
+      }
+    }
+
+    user.profileImage = fileName;
+    await user.save();
+
+    return {
+      success: true,
+      statusCode: HttpStatus.CREATED,
+      data: {
+        message: 'Profile picture updated successfully',
+      }
+    }
+  }
+
+  async findProfileImage(userId: Types.ObjectId) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      return {
+        success: false,
+        data: {
+          message: 'User not found'
+        }
+      }
+    }
+    return user.profileImage
   }
 }
