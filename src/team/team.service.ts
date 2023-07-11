@@ -192,7 +192,6 @@ export class TeamService {
 
   async joinTeamBySelf(registrationCode: string, _id: Types.ObjectId) {
     const team = await this.teamModel.findOne({ registrationCode });
-    console.log(team, _id)
     if (!team) {
       return {
         success: false,
@@ -230,7 +229,6 @@ export class TeamService {
       lastUpdatedBy: fullName,
     });
 
-
     team.members.push(member._id);
     user.team.push(team._id)
 
@@ -261,7 +259,6 @@ export class TeamService {
     }
 
     const member = await this.memberModel.findOne({ teamId, userId });
-    console.log(member)
 
     if (!member) {
       return {
@@ -273,14 +270,18 @@ export class TeamService {
       }
     }
 
-    // Remove the teamId from the user's team array
-    await this.userModel.updateOne({ _id: userId }, { $pull: { team: teamId }});
+    const user = await this.userModel.findById(userId);
+    if (user) {
+      user.team = user.team.filter(t => !t.equals(teamId));
+      await user.save();
+    }
 
     // Remove the userId from the team's members array
-    await this.teamModel.updateOne({ _id: teamId }, { $pull: { members: userId }});
+    team.members = team.members.filter(m => !m.equals(member._id));
+    await team.save();
 
     // Delete the member from the team
-    // await member.deleteOne();
+    await member.deleteOne();
 
     return {
       success: true,
