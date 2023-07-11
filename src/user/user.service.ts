@@ -33,7 +33,6 @@ export class UserService {
   async getTeamList(userId: Types.ObjectId) {
     const user = await this.getUserById(userId)
     const teamList = JSON.parse(JSON.stringify(user.data.team))
-    console.log(teamList)
     const some = await this.teamModel.find({ _id: { $in: teamList } })
     return {
       success: true,
