@@ -8,7 +8,6 @@ import { Group } from "../schema/group.entity";
 import { randomValue } from "../../utils/crypto.utils";
 import { UserService } from "../user/user.service";
 import { Agent } from "../schema/agent.entity";
-// import * as moment from "moment";
 import * as moment from "moment-timezone";
 import { User } from "../schema/user.entity";
 
@@ -262,6 +261,7 @@ export class TeamService {
     }
 
     const member = await this.memberModel.findOne({ teamId, userId });
+    console.log(member)
 
     if (!member) {
       return {
@@ -280,13 +280,51 @@ export class TeamService {
     await this.teamModel.updateOne({ _id: teamId }, { $pull: { members: userId }});
 
     // Delete the member from the team
-    await member.deleteOne();
+    // await member.deleteOne();
 
     return {
       success: true,
       data: {
         statusCode: HttpStatus.OK,
         message: 'Team left successfully',
+      }
+    }
+  }
+
+  async updateTeam(teamId: Types.ObjectId, name: string, plan: string, userId: Types.ObjectId) {
+    const team = await this.teamModel.findById(teamId);
+    if (!team) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Team not found',
+        }
+      }
+    }
+
+    await this.checkMember(teamId, userId)
+    if (!this.checkMember) {
+      return {
+        success: false,
+        statusCode: HttpStatus.FORBIDDEN,
+        data: {
+          statusCode: HttpStatus.FORBIDDEN,
+          message: 'You are not a member of this team',
+        }
+      }
+    }
+
+    team.name = name;
+    team.plan = plan;
+
+    await team.save();
+
+    return {
+      success: true,
+      data: {
+        statusCode: HttpStatus.CREATED,
+        message: 'Team updated successfully',
       }
     }
   }
