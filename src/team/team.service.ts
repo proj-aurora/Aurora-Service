@@ -264,8 +264,13 @@ export class TeamService {
     // Find the team
     const team = await this.teamModel.findById(teamId);
     if (!team) {
-      console.log('Team not found');
-      return;
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Team not found',
+        }
+      }
     }
 
     const exists = await this.memberModel.findOne({ teamId: teamId, userId: userId });
