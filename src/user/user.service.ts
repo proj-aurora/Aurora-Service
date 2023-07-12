@@ -121,7 +121,7 @@ export class UserService {
       }
     }
 
-    user.profileImage = fileName;
+    user.profileImage = '/profile/'+fileName;
     await user.save();
 
     return {
