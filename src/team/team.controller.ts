@@ -52,5 +52,11 @@ export class TeamController {
     return await this.teamService.updateTeam(teamId, name, plan, userId);
   }
 
+  @MessagePattern({ check: 'inviteUser' })
+  async inviteUserToTeam(@Body() body: { teamId: Types.ObjectId, userId: Types.ObjectId, email: string }) {
+    const { teamId, userId, email } = body;
+    return await this.teamService.inviteUser(teamId, email, userId);
+  }
+
 
 }

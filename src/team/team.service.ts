@@ -248,7 +248,6 @@ export class TeamService {
     }
   }
 
-
   async leaveTeam(teamId: Types.ObjectId, userId: Types.ObjectId) {
     const team = await this.teamModel.findById(teamId);
     if (!team) {
@@ -329,6 +328,82 @@ export class TeamService {
       data: {
         statusCode: HttpStatus.CREATED,
         message: 'Team updated successfully',
+      }
+    }
+  }
+
+  async inviteUser(teamId: Types.ObjectId, email: string, userId: Types.ObjectId) {
+    const team = await this.teamModel.findById(teamId);
+
+    if (!team) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Team not found',
+        }
+      }
+    }
+
+    const checkMember = await this.checkMember(teamId, userId)
+    if (!checkMember) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.FORBIDDEN,
+          message: 'You are not a member of this team',
+        }
+      }
+    }
+
+    const user = await this.userModel.findOne({ email: email });
+    if (!user) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'User not found',
+        }
+      }
+    }
+
+    const checkInviteUser = await this.memberModel.findOne({ teamId: team._id, userId: user._id });
+    if (checkInviteUser) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'User already joined this team',
+        }
+      }
+    }
+
+    const nowDate = await this.nowDate();
+    const fullName = await this.fullName(user._id);
+
+    const member = new this.memberModel({
+      teamId: team._id,
+      userId: user._id,
+      name: fullName,
+      email: user.email,
+      phone: user.phone,
+      permission: 'member',
+      lastUpdatedAt: nowDate,
+      lastUpdatedBy: fullName,
+    });
+
+    team.members.push(member._id);
+    user.team.push(team._id)
+
+    await member.save();
+    await team.save();
+    await user.save();
+
+    return {
+      success: true,
+      data: {
+        statusCode: HttpStatus.CREATED,
+        message: 'User invited successfully',
       }
     }
   }
