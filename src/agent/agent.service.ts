@@ -23,7 +23,7 @@ export class AgentService {
   ) {}
 
   async nowDate() {
-    return moment().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
+    return new Date(moment().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'))
   }
 
   async fullName(_id: Types.ObjectId) {
@@ -109,6 +109,57 @@ export class AgentService {
       success: true,
       data: {
         message: 'Agent created successfully',
+      }
+    }
+  }
+
+  async updateAgent(teamId: Types.ObjectId, agentId: Types.ObjectId, userId: Types.ObjectId, name: string) {
+    const team = await this.teamModel.findById(teamId);
+    if (!team) {
+      return {
+        success: false,
+        data: {
+          message: 'Team not found'
+        }
+      }
+    }
+    const group = await this.groupModel.findOne({ teamId: teamId });
+    const groupId = group._id;
+
+    const agent = await this.agentModel.findById(agentId);
+    if (!agent) {
+      return {
+        success: false,
+        data: {
+          message: 'Agent not found'
+        }
+      }
+    }
+
+    console.log(agent.groupId.toString(), groupId.toString());
+    if (agent.groupId.toString() !== groupId.toString()) {
+      return {
+        success: false,
+        data: {
+          message: 'Agent not found in this team'
+        }
+      }
+    }
+
+    //update agent
+    const nowDate = await this.nowDate();
+    const fullName = await this.fullName(userId);
+
+    agent.name = name;
+    agent.lastUpdatedAt = nowDate;
+    agent.lastUpdatedBy = fullName;
+
+    await agent.save();
+
+    return {
+      success: true,
+      data: {
+        message: 'Agent updated successfully',
       }
     }
   }

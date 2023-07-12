@@ -25,4 +25,10 @@ export class AgentController {
     return this.agentService.createAgent(teamId, userId, name);
   }
 
+  @MessagePattern({ check: 'agentUpdate' })
+  async updateAgent(@Body() data: { teamId: Types.ObjectId, userId: Types.ObjectId, agentId: Types.ObjectId, name: string }) {
+    const { teamId, userId, agentId, name } = data;
+    return this.agentService.updateAgent(teamId, agentId, userId, name);
+  }
+
 }
