@@ -53,14 +53,6 @@ export class TeamService {
   async teamInfo(teamId: Types.ObjectId, userId: Types.ObjectId) {
     const team = await this.teamModel.findById(teamId);
 
-    const members = team.members.map(member => member.toString());
-
-    const member = await this.memberModel.find({ _id: { $in: members } });
-
-    const userIds = member.map(member => member.userId ); // Extract userIds as strings
-
-    const users = await this.userModel.find({ _id: { $in: userIds } });
-
     if (!team) {
       return {
         success: false,
@@ -70,6 +62,16 @@ export class TeamService {
         },
       };
     }
+
+    const members = team.members.map(member => member.toString());
+
+    const you = await this.memberModel.findOne({ userId: userId, teamId: teamId });
+
+    const member = await this.memberModel.find({ _id: { $in: members } });
+
+    const userIds = member.map(member => member.userId ); // Extract userIds as strings
+
+    const users = await this.userModel.find({ _id: { $in: userIds } });
 
     const authorizedUser = users.find(user => user._id.toString() === userId.toString());
     if (!authorizedUser) {
@@ -85,7 +87,8 @@ export class TeamService {
     return {
       success: true,
       data: {
-        team
+        team,
+        you
       }
     };
   }
