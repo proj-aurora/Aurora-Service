@@ -17,9 +17,6 @@ export class Group {
 
   @Prop({ required: true })
   lastUpdatedBy: string;
-
-  @Prop({ required: true, default: 'off' }) // 'off'로 초기값 설정
-  status: string;
 }
 
 export const GroupSchema = SchemaFactory.createForClass(Group);
