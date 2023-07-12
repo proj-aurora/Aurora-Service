@@ -13,7 +13,7 @@ export class AgentService {
   async recentData(key: string, limit: number) {
     const log = await this.agentDataModel
       .find({ key: key })
-      .sort({ datetime: -1 })
+      .sort({ 'data.Timestamp': 1 })
       .limit(limit)
       .exec();
 
