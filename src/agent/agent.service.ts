@@ -123,6 +123,17 @@ export class AgentService {
         }
       }
     }
+
+    const member = await this.memberModel.findOne({ userId: userId, teamId: teamId });
+    if (!member) {
+      return {
+        success: false,
+        data: {
+          message: 'User is not a member of this team'
+        }
+      }
+    }
+
     const group = await this.groupModel.findOne({ teamId: teamId });
     const groupId = group._id;
 
