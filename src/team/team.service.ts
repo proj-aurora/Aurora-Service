@@ -257,7 +257,6 @@ export class TeamService {
   }
 
   async memberExpulsion(userId: Types.ObjectId, teamMemberPairs: Array<{ teamId: Types.ObjectId, memberId: Types.ObjectId }>) {
-    console.log(userId, teamMemberPairs);
 
     // All teamIds are assumed to be the same, so take the first one
     const { teamId } = teamMemberPairs[0];
@@ -265,8 +264,19 @@ export class TeamService {
     // Find the team
     const team = await this.teamModel.findById(teamId);
     if (!team) {
-      console.log('Team not found with id', teamId);
+      console.log('Team not found');
       return;
+    }
+
+    const exists = await this.memberModel.findOne({ teamId: teamId, userId: userId });
+    if (!exists) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'You are not a member of this team',
+        }
+      }
     }
 
     for (const { memberId } of teamMemberPairs) {
