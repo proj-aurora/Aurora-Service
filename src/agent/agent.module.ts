@@ -4,7 +4,7 @@ import { AgentController } from "./agent.controller";
 import { AgentService } from "./agent.service";
 import { Agent_Data, AgentDataSchema } from "../schema/agent_data.entity";
 import { SyslogGateway } from "./agent.socket";
-import { Agent, AgentSchema } from "../schema/Agent.entity";
+import { Agent, AgentSchema } from "../schema/agent.entity";
 import { Group, GroupSchema } from "../schema/group.entity";
 import { Team, TeamSchema } from "../schema/team.entity";
 import { Member, MemberSchema } from "../schema/members.entity";
