@@ -149,9 +149,9 @@ export class TeamService {
     return team;
   }
 
-  async deleteTeam(_id: Types.ObjectId) {
+  async deleteTeam(teamId: Types.ObjectId, userId: Types.ObjectId) {
     // Find the team by ID
-    const team = await this.teamModel.findById(_id);
+    const team = await this.teamModel.findById(teamId);
     if (!team) {
       return {
         success: false,
@@ -162,17 +162,22 @@ export class TeamService {
       }
     }
 
-    await this.userModel.updateMany({ team: { _id } }, { $pull: { team: { _id } } })
+    // Remove the teamId from the user's team array
+    const users = await this.userModel.find({ team: { $in: teamId } });
+    for (const user of users) {
+      user.team = user.team.filter(t => !t.equals(teamId));
+      await user.save();
+    }
 
     // Delete the team's members
-    await this.memberModel.deleteMany({ teamId: _id });
+    await this.memberModel.deleteMany({ teamId: teamId });
 
     // Delete the team's agents
-    const group = await this.groupModel.find({ teamId: _id });
-    await this.agentModel.deleteMany({ groupId: group[0]._id })
+    const group = await this.groupModel.findOne({ teamId: teamId });
+    await this.agentModel.deleteMany({ groupId: group._id })
 
     // Delete the team's groups
-    await this.groupModel.deleteMany({ teamId: _id });
+    await this.groupModel.deleteMany({ teamId: teamId });
 
     // Delete the team
     await team.deleteOne();

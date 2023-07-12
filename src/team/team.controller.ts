@@ -23,8 +23,9 @@ export class TeamController {
 
   // @Delete('delete')
   @MessagePattern({ check: 'teamDelete' })
-  async deleteTeam(@Body() _id: Types.ObjectId) {
-    return await this.teamService.deleteTeam(_id);
+  async deleteTeam(@Body() data: { teamId: Types.ObjectId, userId: Types.ObjectId }) {
+    const { teamId, userId } = data;
+    return await this.teamService.deleteTeam(teamId, userId);
   }
 
   // @Post('join')
