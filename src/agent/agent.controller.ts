@@ -31,4 +31,10 @@ export class AgentController {
     return this.agentService.updateAgent(teamId, agentId, userId, name);
   }
 
+  @MessagePattern({ check: 'agentDelete' })
+  async deleteAgent(@Body() data: { teamId: Types.ObjectId, userId: Types.ObjectId, agentId: Types.ObjectId }) {
+    const { teamId, userId, agentId } = data;
+    return this.agentService.deleteAgent(teamId, agentId, userId);
+  }
+
 }

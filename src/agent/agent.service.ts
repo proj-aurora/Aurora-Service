@@ -173,4 +173,65 @@ export class AgentService {
       }
     }
   }
+
+  async deleteAgent(teamId: Types.ObjectId, agentId: Types.ObjectId, userId: Types.ObjectId) {
+    const team = await this.teamModel.findById(teamId);
+    if (!team) {
+      return {
+        success: false,
+        data: {
+          message: 'Team not found'
+        }
+      }
+    }
+
+    const member = await this.memberModel.findOne({ userId: userId, teamId: teamId });
+    if (!member) {
+      return {
+        success: false,
+        data: {
+          message: 'User is not a member of this team'
+        }
+      }
+    }
+
+    const group = await this.groupModel.findOne({ teamId: teamId });
+    const groupId = group._id;
+
+    const agent = await this.agentModel.findById(agentId);
+    if (!agent) {
+      return {
+        success: false,
+        data: {
+          message: 'Agent not found'
+        }
+      }
+    }
+
+    if (agent.groupId.toString() !== groupId.toString()) {
+      return {
+        success: false,
+        data: {
+          message: 'Agent not found in this team'
+        }
+      }
+    }
+
+    //delete agents from group
+    group.agents = group.agents.filter((agentId) => {
+      return agentId.toString() !== agent._id.toString();
+    })
+    await group.save();
+
+    //delete agent
+    await this.agentModel.deleteOne({ _id: agentId });
+
+    return {
+      success: true,
+      data: {
+        message: 'Agent deleted successfully',
+      }
+    }
+
+  }
 }
