@@ -136,7 +136,6 @@ export class AgentService {
       }
     }
 
-    console.log(agent.groupId.toString(), groupId.toString());
     if (agent.groupId.toString() !== groupId.toString()) {
       return {
         success: false,
