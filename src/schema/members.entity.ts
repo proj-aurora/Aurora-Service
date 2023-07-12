@@ -1,5 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, HydratedDocument, Types } from "mongoose";
+import { Team } from "./team.entity";
+
+export type MemberDocument = HydratedDocument<Member>;
 
 @Schema()
 export class Member {
@@ -20,6 +23,9 @@ export class Member {
 
   @Prop({ required: true, default: 'owner' }) // owner로 초기값 설정
   permission: string;
+
+  @Prop()
+  profileImage: string;
 
   @Prop({ required: true })
   lastUpdatedAt: Date;

@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { User, UserDocument } from "../schema/user.entity";
 import { Team, TeamDocument } from "../schema/team.entity";
+import { Member, MemberDocument } from "../schema/members.entity";
 import { Model, Types } from "mongoose";
 import { AsyncResponseBody } from "../model/ResponseBody";
 import { UserUpdateDto } from "../dto/user_update.dto";
@@ -12,7 +13,8 @@ export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Team.name) private teamModel: Model<TeamDocument>,
-  ) {}
+    @InjectModel(Member.name) private memberModel: Model<MemberDocument>,
+) {}
 
   async getUserById(_id: Types.ObjectId) {
     const userInfo = await this.userModel.findById(_id)
@@ -121,7 +123,16 @@ export class UserService {
       }
     }
 
-    user.profileImage = '/profile/'+fileName;
+    const members = await this.memberModel.find({ userId: userId });
+
+    const filePath = '/profile/' + fileName;
+
+    for (const member of members) {
+      member.profileImage = filePath;
+      await member.save();
+    }
+
+    user.profileImage = filePath;
     await user.save();
 
     return {

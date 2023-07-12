@@ -10,6 +10,7 @@ import { UserService } from "../user/user.service";
 import { Agent } from "../schema/agent.entity";
 import * as moment from "moment-timezone";
 import { User } from "../schema/user.entity";
+import { Response } from "express";
 
 @Injectable()
 export class TeamService {
@@ -112,6 +113,7 @@ export class TeamService {
       name: fullName,
       email: user.data.email,
       phone: user.data.phone,
+      profileImage: user.data.profileImage,
       lastUpdatedAt: nowDate,
       lastUpdatedBy: fullName,
     });
@@ -233,6 +235,7 @@ export class TeamService {
       email: user.email,
       phone: user.phone,
       permission: 'member',
+      profileImage: user.profileImage,
       lastUpdatedAt: nowDate,
       lastUpdatedBy: fullName,
     });
@@ -393,6 +396,7 @@ export class TeamService {
       email: user.email,
       phone: user.phone,
       permission: 'member',
+      profileImage: user.profileImage,
       lastUpdatedAt: nowDate,
       lastUpdatedBy: fullName,
     });
