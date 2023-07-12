@@ -287,6 +287,16 @@ export class TeamService {
         continue;
       }
 
+      if (member.permission === 'owner') {
+        return {
+          success: false,
+          data: {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: 'You cannot expel the owner',
+          }
+        }
+      }
+
       // Find the user and remove the team from their teams array
       const user = await this.userModel.findById(member.userId);
       if (user) {
