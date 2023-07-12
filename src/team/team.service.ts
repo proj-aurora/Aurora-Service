@@ -256,6 +256,55 @@ export class TeamService {
     }
   }
 
+  async memberExpulsion(userId: Types.ObjectId, teamMemberPairs: Array<{ teamId: Types.ObjectId, memberId: Types.ObjectId }>) {
+    console.log(userId, teamMemberPairs);
+
+    // All teamIds are assumed to be the same, so take the first one
+    const { teamId } = teamMemberPairs[0];
+
+    // Find the team
+    const team = await this.teamModel.findById(teamId);
+    if (!team) {
+      console.log('Team not found with id', teamId);
+      return;
+    }
+
+    for (const { memberId } of teamMemberPairs) {
+      // Find and remove the member from the team
+      const member = await this.memberModel.findById(memberId);
+      if (!member) {
+        console.log('Member not found with id', memberId);
+        continue;
+      }
+
+      // Find the user and remove the team from their teams array
+      const user = await this.userModel.findById(member.userId);
+      if (user) {
+        user.team = user.team.filter(t => !t.equals(teamId));
+        await user.save();
+      }
+
+      // Remove the memberId from the team's members array
+      team.members = team.members.filter(m => !m.equals(memberId));
+
+      // Delete the member
+      await member.deleteOne();
+    }
+
+    // Save the team after all members have been removed
+    await team.save();
+
+    return {
+      success: true,
+      data: {
+        statusCode: HttpStatus.OK,
+        message: 'Members expelled successfully',
+      }
+    }
+  }
+
+
+
   async leaveTeam(teamId: Types.ObjectId, userId: Types.ObjectId) {
     const team = await this.teamModel.findById(teamId);
     if (!team) {

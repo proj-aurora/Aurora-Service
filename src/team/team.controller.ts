@@ -41,6 +41,16 @@ export class TeamController {
     return await this.teamService.leaveTeam(teamId, userId);
   }
 
+  @MessagePattern({ check: 'memberExpulsion' })
+  async memberExpulsion(@Body() body: { [key: string]: { teamId: Types.ObjectId, memberId: Types.ObjectId } | Types.ObjectId }) {
+    const userId: Types.ObjectId = body.userId as Types.ObjectId; // Explicitly extract userId
+    const teamsAndMembers = { ...body };
+    delete teamsAndMembers.userId; // Remove userId from the teamsAndMembers object
+    const teamMemberPairs: Array<{ teamId: Types.ObjectId, memberId: Types.ObjectId }> =
+      Object.values(teamsAndMembers).filter((value): value is { teamId: Types.ObjectId, memberId: Types.ObjectId } => 'teamId' in value && 'memberId' in value);
+    return await this.teamService.memberExpulsion(userId, teamMemberPairs);
+  }
+
   @MessagePattern({ check: 'teamMemberList' })
   async leaveTeam(@Body() body: { teamId: Types.ObjectId, userId: Types.ObjectId }) {
     const { teamId, userId } = body;
