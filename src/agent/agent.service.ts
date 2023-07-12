@@ -68,7 +68,11 @@ export class AgentService {
 
     const group = await this.groupModel.findOne({ teamId: teamId });
 
-    return this.agentModel.find({ _id: { $in: group.agents } });
+    const agentIds = group.agents.map((agentId) => {
+      return agentId.toString();
+    })
+
+    return this.agentModel.find({ _id: { $in: agentIds } })
   }
 
   async createAgent(teamId: Types.ObjectId, userId: Types.ObjectId, name: string) {
@@ -95,10 +99,10 @@ export class AgentService {
       lastUpdatedAt: nowDate,
       lastUpdatedBy: fullName,
     });
+
+    group.agents.push(agent._id);
+
     await agent.save();
-
-
-    group.agents = [agent._id];
     await group.save();
 
     return {
