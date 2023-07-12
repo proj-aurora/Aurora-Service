@@ -1,8 +1,9 @@
 // team.controller.ts
-import { Controller, Post, Body, Delete, Get } from "@nestjs/common";
+import { Controller, Post, Body, Delete, Get, Res, Req } from "@nestjs/common";
 import { TeamService } from './team.service';
 import { Types } from "mongoose";
 import { MessagePattern } from "@nestjs/microservices";
+import { Response } from "express";
 
 @Controller('team')
 export class TeamController {
@@ -69,5 +70,9 @@ export class TeamController {
     return await this.teamService.inviteUser(teamId, email, userId);
   }
 
-
+  @MessagePattern({ check: 'changeOwner' })
+  async changeOwner(@Body() body: { teamId: Types.ObjectId, userId: Types.ObjectId, memberId: Types.ObjectId }) {
+    const { teamId, userId, memberId } = body;
+    return await this.teamService.changeOwner(teamId, memberId, userId);
+  }
 }

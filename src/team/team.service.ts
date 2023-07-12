@@ -465,4 +465,63 @@ export class TeamService {
       }
     }
   }
+
+  async changeOwner(teamId: Types.ObjectId, memberId: Types.ObjectId, userId: Types.ObjectId) {
+    const team = await this.teamModel.findById(teamId);
+    if (!team) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Team not found',
+        }
+      }
+    }
+
+    const checkMember = await this.memberModel.findOne({ teamId: teamId, userId: userId })
+    if (!checkMember) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.FORBIDDEN,
+          message: 'You are not a member of this team',
+        }
+      }
+    }
+    if (checkMember.permission !== 'owner') {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.FORBIDDEN,
+          message: 'You are not the owner of this team',
+        }
+      }
+    }
+
+    const member = await this.memberModel.findById(memberId);
+    if (!member) {
+      return {
+        success: false,
+        data: {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'Member not found',
+        }
+      }
+    }
+
+    member.permission = 'owner';
+    checkMember.permission = 'member';
+
+    await member.save();
+    await checkMember.save();
+
+    return {
+      success: true,
+      data: {
+        statusCode: HttpStatus.OK,
+        message: 'change owner successfully',
+      }
+    }
+
+  }
 }
