@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { AgentService } from "./agent.service";
 import { MessagePattern } from "@nestjs/microservices";
+import { Types } from "mongoose";
 
 @Controller('agent')
 export class AgentController {
